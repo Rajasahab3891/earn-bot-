@@ -7,9 +7,9 @@ TOKEN = 'YOUR_BOT_TOKEN_HERE'
 bot = telebot.TeleBot(TOKEN)
 
 # टेलीग्राम ग्रुप लिंक (यहाँ अपना ग्रुप लिंक डाल)
-GROUP_LINK = 'https://t.me/GameMastiGang'
+GROUP_LINK = 'https://t.me/kingotp_payous'
 # यूट्यूब गेमिंग चैनल लिंक (यहाँ अपना चैनल लिंक डाल)
-YOUTUBE_CHANNEL = 'https://youtube.com/@YourGamingChannel'
+YOUTUBE_CHANNEL = 'https://www.youtube.com/@Expiredgamer0090'
 
 # डेटाबेस सेटअप
 conn = sqlite3.connect('referrals.db', check_same_thread=False)
@@ -72,7 +72,7 @@ markup.add(types.KeyboardButton("Hindi"), types.KeyboardButton("Tamil"), types.K
 
     # ग्रुप जॉइन चेक
     try:
-        status = bot.get_chat_member(chat_id="@GameMastiGang", user_id=user_id).status
+        status = bot.get_chat_member(chat_id="@kingotp_payous", user_id=user_id).status
         if status in ['member', 'administrator', 'creator']:
             # रेफरल हैंडल
             if len(args) > 1 and args[1] != str(user_id):
@@ -90,7 +90,7 @@ markup.add(types.KeyboardButton("Hindi"), types.KeyboardButton("Tamil"), types.K
 
             # रेफरल लिंक
             ref_link = f"https://t.me/{bot.get_me().username}?start={ref_code}"
-            bot.send_photo(message.chat.id, "https://i.imgur.com/5zQ9Z0x.jpg", caption=MESSAGES[lang]['ref_link'].format(link=ref_link, youtube=YOUTUBE_CHANNEL))
+            bot.send_photo(message.chat.id, "https://envs.sh/CYA.jpg", caption=MESSAGES[lang]['ref_link'].format(link=ref_link, youtube=YOUTUBE_CHANNEL))
         else:
             bot.reply_to(message, MESSAGES[lang]['group_join'].format(group=GROUP_LINK))
     except:
