@@ -58,12 +58,13 @@ def send_welcome(message):
     cursor.execute("SELECT language FROM users WHERE user_id=?", (user_id,))
     lang = cursor.fetchone()
 
-    if not lang:  # अगर लैंग्वेज नहीं चुना
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-markup.add(types.KeyboardButton("Hindi"), types.KeyboardButton("Tamil"), types.KeyboardButton("Telugu"))
-        bot.reply_to(message, "अरे भाई, पहले लैंग्वेज चुन ले, मस्ती फुल ऑन होगी! 😜", reply_markup=markup)
-        bot.register_next_step_handler(message, set_language)
-        return
+    if not lang:
+    # अगर लैंग्वेज नहीं चुना
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton("Hindi"), types.KeyboardButton("Tamil"), types.KeyboardButton("Telugu"))
+    bot.reply_to(message, "अरे भाई, पहले लैंग्वेज चुन ले, मस्ती फुल औं होगी! 😎", reply_markup=markup)
+    bot.register_next_step_handler(message, set_language)
+    return
 
     lang = lang[0]
     ref_code = str(user_id)
