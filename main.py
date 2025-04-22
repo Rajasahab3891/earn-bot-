@@ -2,23 +2,18 @@ import telebot
 import sqlite3
 from telebot import types
 
-# BotFather से टोकन (यहाँ अपना टोकन डाल, भाई!)
-TOKEN = 'YOUR_BOT_TOKEN_HERE'
+TOKEN = '8041182528:AAFZ_jt8T9oD0tBUCpOAIwd5nT27zY1ePw0'
 bot = telebot.TeleBot(TOKEN)
 
-# टेलीग्राम ग्रुप लिंक (यहाँ अपना ग्रुप लिंक डाल)
 GROUP_LINK = 'https://t.me/kingotp_payous'
-# यूट्यूब गेमिंग चैनल लिंक (यहाँ अपना चैनल लिंक डाल)
 YOUTUBE_CHANNEL = 'https://www.youtube.com/@Expiredgamer0090'
 
-# डेटाबेस सेटअप
 conn = sqlite3.connect('referrals.db', check_same_thread=False)
 cursor = conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS users 
-                 (user_id INTEGER PRIMARY KEY, referrals INTEGER, balance REAL, ref_code TEXT, language TEXT)''')
+cursor.execute('''CREATE TABLE IF NOT EXISTS users
+                  (user_id INTEGER PRIMARY KEY, referrals INTEGER, balance REAL, ref_code TEXT, language TEXT)''')
 conn.commit()
 
-# लैंग्वेज डिक्शनरी (हर लैंग्वेज में नॉटी मैसेज)
 MESSAGES = {
     'hindi': {
         'welcome': "अरे भाई, मस्ती की दुनिया में स्वागत! 😎 पहले {group} ग्रुप जॉइन कर, फिर 10 दोस्त बुला, ₹1 झटक! 🤑\nमेरे गेमिंग चैनल {youtube} पर भी जॉइन कर, PUBG की धूम मचा! 🎮",
@@ -47,34 +42,30 @@ MESSAGES = {
         'balance': "నీ ఖజానా: ₹{balance} 💰\nరెఫరల్స్: {refs} 😎\nఇంకా ఫ్రెండ్స్‌ని తీసుకొచ్చు, {youtube}లో గేమింగ్ మస్తీ చేయి! 🚀",
         'leaderboard': "🏆 టాప్ మస్తీ హీరోలు 🏆\n{list}\nనీవు కూడా గేమింగ్ కింగ్ అవ్వు, రెఫర్ చేయి! 😈"
     }
-    # और लैंग्वेज (बंगाली, मराठी, आदि) बाद में ऐड कर सकते हैं
 }
 
-# स्टार्ट कमांड
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user_id = message.from_user.id
     args = message.text.split()
     cursor.execute("SELECT language FROM users WHERE user_id=?", (user_id,))
-    lang = cursor.fetchone()
+    result = cursor.fetchone()
 
-    if some_condition:
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("Hindi"), types.KeyboardButton("Tamil"), types.KeyboardButton("Telugu"))
-    bot.reply_to(message, "अरे भाई, पहले लैंग्वेज चुन ले, मस्ती फुल औं होगी! 😎", reply_markup=markup)
-    bot.register_next_step_handler(message, set_language)
-    return
+    if not result:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add(types.KeyboardButton("Hindi"), types.KeyboardButton("Tamil"), types.KeyboardButton("Telugu"))
+        bot.reply_to(message, "अरे भाई, पहले लैंग्वेज चुन ले, मस्ती फुल औं होगी! 😎", reply_markup=markup)
+        bot.register_next_step_handler(message, set_language)
+        return
 
-    lang = lang[0]
+    lang = result[0]
     ref_code = str(user_id)
     cursor.execute("INSERT OR IGNORE INTO users (user_id, referrals, balance, ref_code, language) VALUES (?, 0, 0.0, ?, ?)", (user_id, ref_code, lang))
     conn.commit()
 
-    # ग्रुप जॉइन चेक
     try:
         status = bot.get_chat_member(chat_id="@kingotp_payous", user_id=user_id).status
         if status in ['member', 'administrator', 'creator']:
-            # रेफरल हैंडल
             if len(args) > 1 and args[1] != str(user_id):
                 ref_code = args[1]
                 cursor.execute("SELECT user_id, language FROM users WHERE ref_code=?", (ref_code,))
@@ -88,20 +79,20 @@ def send_welcome(message):
                         bot.send_message(referrer[0], MESSAGES[referrer[1]]['reward'])
                     conn.commit()
 
-            # रेफरल लिंक
             ref_link = f"https://t.me/{bot.get_me().username}?start={ref_code}"
-            bot.send_photo(message.chat.id, "https://envs.sh/CYA.jpg", caption=MESSAGES[lang]['ref_link'].format(link=ref_link, youtube=YOUTUBE_CHANNEL))
+            bot.send_photo(message.chat.id, "https://envs.sh/CYA.jpg",
+                           caption=MESSAGES[lang]['ref_link'].format(link=ref_link, youtube=YOUTUBE_CHANNEL))
         else:
             bot.reply_to(message, MESSAGES[lang]['group_join'].format(group=GROUP_LINK))
     except:
         bot.reply_to(message, MESSAGES[lang]['group_join'].format(group=GROUP_LINK))
 
-# लैंग्वेज सेट
 def set_language(message):
     user_id = message.from_user.id
     lang = message.text.lower()
     if lang in ['hindi', 'tamil', 'telugu']:
-        cursor.execute("INSERT OR IGNORE INTO users (user_id, referrals, balance, ref_code, language) VALUES (?, 0, 0.0, ?, ?)", (user_id, str(user_id), lang))
+        cursor.execute("INSERT OR IGNORE INTO users (user_id, referrals, balance, ref_code, language) VALUES (?, 0, 0.0, ?, ?)",
+                       (user_id, str(user_id), lang))
         cursor.execute("UPDATE users SET language=? WHERE user_id=?", (lang, user_id))
         conn.commit()
         bot.reply_to(message, MESSAGES[lang]['welcome'].format(group=GROUP_LINK, youtube=YOUTUBE_CHANNEL))
@@ -109,7 +100,6 @@ def set_language(message):
         bot.reply_to(message, "अरे भाई, सही लैंग्वेज चुन! 😜")
         bot.register_next_step_handler(message, set_language)
 
-# बैलेंस चेक
 @bot.message_handler(commands=['balance'])
 def check_balance(message):
     user_id = message.from_user.id
@@ -120,15 +110,19 @@ def check_balance(message):
     else:
         bot.reply_to(message, "अरे नौटंकीबाज, पहले /start कर! 😜")
 
-# लीडरबोर्ड
 @bot.message_handler(commands=['leaderboard'])
 def leaderboard(message):
     user_id = message.from_user.id
     cursor.execute("SELECT language FROM users WHERE user_id=?", (user_id,))
-    lang = cursor.fetchone()[0] if cursor.fetchone() else 'hindi'
+    result = cursor.fetchone()
+    lang = result[0] if result else 'hindi'
+
     cursor.execute("SELECT user_id, referrals FROM users ORDER BY referrals DESC LIMIT 5")
     top_users = cursor.fetchall()
     msg = ""
     for i, user in enumerate(top_users, 1):
         msg += f"{i}. भाई {user[0]}: {user[1]} रेफरल्स 🔥\n"
     bot.reply_to(message, MESSAGES[lang]['leaderboard'].format(list=msg))
+
+# Start polling
+bot.infinity_polling()
